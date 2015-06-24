@@ -1,0 +1,26 @@
+<div ng-cloak class="row news-articles">
+    <div ng-clock ng-if="dataSuccess === true">
+        <div class="col-sm-6 col-md-4 news-article" ng-repeat="n in news">
+            <div class="thumbnail" ng-click="showArticle(n.category_id,n.id)">
+                <img ng-cloak ng-src="{{n.image}}" alt="{{n.title}}">
+                <div class="news-cat {{convertIdToCategoryName(n.category_id)}}">{{convertIdToCategoryName(n.category_id)}} article</div>
+                <div class="caption">
+                    <div class="title">
+                        <h3>{{n.title}}</h3>
+                    </div>
+                    <p class="content">{{n.content}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div ng-clock ng-if="dataSuccess !== true">
+        <div class="col-sm-12 col-md-12">
+            <div class="alert alert-danger" ng-repeat="error in news" role="alert">{{error.content}}</div>
+        </div>
+    </div>
+    <div ng-clock ng-show="!news.length">
+        <div class="col-sm-12 col-md-12">
+            <div class="alert alert-info" role="alert">No news articles found, please check back soon.</div>
+        </div>
+    </div>
+</div>

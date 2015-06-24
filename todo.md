@@ -1,0 +1,3 @@
+- like and dislike buttons
+- Style
+- paginations / filtering
