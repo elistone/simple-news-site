@@ -1,10 +1,13 @@
+// nabar
+.navbar{
+    border-radius:0px;
+}
 
 // news articals
 .news-articles{
     .news-article{
         .thumbnail{
             position: relative;
-            
             &:hover{
                 cursor: pointer;
             }
@@ -58,6 +61,7 @@
     }
 }
 
+// article
 .article{
 
     .article-like-btns{
@@ -65,7 +69,80 @@
     }
     
     .content{
-        margin-bottom: 10px;   
+        margin-bottom: 20px;   
     }
     
+}
+
+
+// col override
+.center-block{
+    float: none;
+}
+
+
+
+// button variant mixin
+@mixin button-variant($color, $background, $border) {
+  color: $color;
+  background-color: $background;
+  border-color: $border;
+
+  &:focus,
+  &.focus {
+    color: $color;
+    background-color: darken($background, 10%);
+        border-color: darken($border, 25%);
+  }
+  &:hover {
+    color: $color;
+    background-color: darken($background, 10%);
+        border-color: darken($border, 12%);
+  }
+  &:active,
+  &.active,
+  .open > &.dropdown-toggle {
+    color: $color;
+    background-color: darken($background, 10%);
+        border-color: darken($border, 12%);
+
+    &:hover,
+    &:focus,
+    &.focus {
+      color: $color;
+      background-color: darken($background, 17%);
+          border-color: darken($border, 25%);
+    }
+  }
+  &:active,
+  &.active,
+  .open > &.dropdown-toggle {
+    background-image: none;
+  }
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &.focus,
+    &:active,
+    &.active {
+      background-color: $background;
+          border-color: $border;
+    }
+  }
+
+  .badge {
+    color: $background;
+    background-color: $color;
+  }
+}
+
+.btn-like {
+  @include button-variant(#FFF, #94b5d7, #667d95);
+}
+
+.btn-dislike{
+    @include button-variant(#FFF, #848ed7, #5e6498);
 }

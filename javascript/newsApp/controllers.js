@@ -99,7 +99,7 @@ newsApp.controller('newsCategoryController', ['$scope', '$log', '$http', '$route
 
 
 // news Controller
-newsApp.controller('newsController', ['$scope', '$log', '$http', '$routeParams', '$location', 'newsAppConfig', 'NewsService', function($scope, $log, $http, $routeParams, $location, newsAppConfig, NewsService) {
+newsApp.controller('newsController', ['$scope', '$log', '$http', '$routeParams', '$location', '$cookies', 'newsAppConfig', 'NewsService', function($scope, $log, $http, $routeParams, $location, $cookies, newsAppConfig, NewsService) {
         // get all news
         $http.get(newsAppConfig.apiUrl+'/category/'+$routeParams.catId+'/news/'+$routeParams.newsId)
         .success(function (result) {
@@ -109,6 +109,9 @@ newsApp.controller('newsController', ['$scope', '$log', '$http', '$routeParams',
             $scope.article = data;
             $scope.dataSuccess = true;
 
+            var voteCookie = $cookies['voted'+$routeParams.newsId];
+            if(voteCookie){ $scope.article.voted = "voted"; }
+            
             // log
             $log.debug('article result:',result);
         }).error(function (data, status) {
@@ -123,41 +126,60 @@ newsApp.controller('newsController', ['$scope', '$log', '$http', '$routeParams',
         $scope.convertIdToCategoryName = NewsService.convertIdToCategoryName;
     
         // function to increament likes
-        $scope.addLike = function(dataObject,catId,newsId){    
-            var new_count = (parseInt(dataObject.likes) + 1);
-            $http.put(newsAppConfig.apiUrl+'/category/'+catId+'/news/'+newsId, 
-                       { content: dataObject.content, 
-                        image: dataObject.image, 
-                        title: dataObject.title, 
-                        likes: new_count, 
-                        dislikes: dataObject.dislikes })
-            .success(function (result) {
-                $log.debug(result);
-                $scope.article.likes = new_count;
-            })
-            .error(function (data, status) {
-                $log.error(data);
-                $scope.article.likes = "Error Updating";
-            });
+        $scope.addLike = function(dataObject,catId,newsId){ 
+            
+            // check if already voted
+            var voteCookie = $cookies['voted'+newsId];
+            if(!voteCookie){
+                // send post updating dislikes
+                var new_count = (parseInt(dataObject.likes) + 1);
+                $http.put(newsAppConfig.apiUrl+'/category/'+catId+'/news/'+newsId, 
+                           { content: dataObject.content, 
+                            image: dataObject.image, 
+                            title: dataObject.title, 
+                            likes: new_count, 
+                            dislikes: dataObject.dislikes })
+                .success(function (result) {
+                    $log.debug(result);
+                    $scope.article.likes = new_count;
+                    $cookies['voted'+newsId] = true;
+                })
+                .error(function (data, status) {
+                    $log.error(data);
+                    $scope.article.likes = "Error Updating";
+                });
+                
+            }else{
+                $scope.article.voted = "voted";
+            }
         }
         
         // function to increament dislikes
         $scope.addDislike = function(dataObject,catId,newsId){
-            var new_count = (parseInt(dataObject.dislikes) + 1);
-            $http.put(newsAppConfig.apiUrl+'/category/'+catId+'/news/'+newsId, 
-                       { content: dataObject.content, 
-                        image: dataObject.image, 
-                        title: dataObject.title, 
-                        likes: dataObject.likes, 
-                        dislikes:  new_count})
-            .success(function (result) {
-                $log.debug(result);
-                $scope.article.dislikes = new_count;
-
-            })
-            .error(function (data, status) {
-                $log.error(data);
-                $scope.article.dislikes = "Error Updating";
-            });
+            
+            // check if already voted
+            var voteCookie = $cookies['voted'+newsId]            
+            if(!voteCookie){
+                // send post updating dislikes
+                var new_count = (parseInt(dataObject.dislikes) + 1);
+                $http.put(newsAppConfig.apiUrl+'/category/'+catId+'/news/'+newsId, 
+                           { content: dataObject.content, 
+                            image: dataObject.image, 
+                            title: dataObject.title, 
+                            likes: dataObject.likes, 
+                            dislikes:  new_count})
+                .success(function (result) {
+                    $log.debug(result);
+                    $scope.article.dislikes = new_count;
+                    $cookies['voted'+newsId] = true;
+                })
+                .error(function (data, status) {
+                    $log.error(data);
+                    $scope.article.dislikes = "Error Updating";
+                });
+                
+            }else{
+                $scope.article.voted = "voted";
+            }
         }
 }]);
